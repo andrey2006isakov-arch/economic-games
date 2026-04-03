@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра 2: Симулятор Биржи</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: flex-start; padding-top: 20px; min-height: 100vh; margin: 0; }
+        .game-container { background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 700px; }
+        .budget { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 20px; }
+        .news-card { background-color: #e9f7fe; border-left: 5px solid #2196F3; padding: 15px; margin-bottom: 30px; text-align: left; font-size: 16px; line-height: 1.6; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .news-card strong { color: #2196F3; }
+        .assets-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; margin-bottom: 30px; }
+        .asset-card { background-color: #fdfdfd; border: 1px solid #eee; border-radius: 8px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.07); transition: transform 0.2s ease-in-out; }
+        .asset-card:hover { transform: translateY(-5px); }
+        .asset-info { margin-bottom: 15px; }
+        .asset-name { font-size: 18px; font-weight: bold; margin-bottom: 8px; color: #444; display: flex; align-items: center; gap: 8px; }
+        .asset-price { font-size: 17px; color: #555; margin-bottom: 4px; }
+        .asset-quantity { font-size: 14px; color: #777; }
+        .price-change { font-size: 12px; padding: 3px 6px; border-radius: 4px; margin-left: 8px; }
+        .price-up { background-color: #4CAF50; color: white; }
+        .price-down { background-color: #f44336; color: white; }
+        .asset-controls button { background-color: #2196F3; color: white; border: none; padding: 10px 15px; margin: 5px; border-radius: 5px; cursor: pointer; font-size: 14px; transition: background-color 0.3s ease; }
+        .asset-controls button:hover { background-color: #1976D2; }
+        .asset-controls .sell { background-color: #f44336; }
+        .asset-controls .sell:hover { background-color: #d32f2f; }
+        .next, .history-btn { background-color: #4CAF50; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px; transition: background-color 0.3s ease; }
+        .next:hover, .history-btn:hover { background-color: #45a049; }
+        .history-btn { background-color: #FFC107; margin-left: 10px; }
+        .history-btn:hover { background-color: #e0a800; }
+        .game-over-message { font-size: 30px; font-weight: bold; color: #d32f2f; margin-bottom: 20px; }
+        .final-score-container { margin-top: 25px; padding: 15px; border-radius: 8px; font-size: 18px; line-height: 1.7; }
+        .score-excellent { background-color: #e8f5e9; border: 1px solid #7cb342; color: #33691e; }
+        .score-average { background-color: #fff8e1; border: 1px solid #fbc02d; color: #f57f17; }
+        .score-poor { background-color: #ffebee; border: 1px solid #e57373; color: #c62828; }
+        .final-score-container strong { color: #333; }
+        .nav-buttons { margin-top: 30px; display: flex; justify-content: center; gap: 15px; }
+        .nav-buttons a, .nav-buttons button { text-decoration: none; background-color: #17a2b8; color: white; padding: 12px 25px; border-radius: 5px; border: none; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="game-container" id="game-container">
+        <div class="budget" id="budget">💰 Бюджет: 1000 ₽</div>
+        <div class="news-card" id="news">📢 Ждём новость... Нажмите "Следующий раунд"!</div>
+        <div class="assets-grid" id="assets"></div>
+        <button class="next" onclick="nextRound()">Следующий раунд</button>
+        <button class="history-btn" onclick="showHistory()">Показать историю</button>
+        <div class="nav-buttons" style="margin-top: 15px;"><a href="index.html">Главное меню</a></div>
+    </div>
+
+    <script>
+        let gameData;
+        const initialGameData = {
+            budget: 1000,
+            assets: [
+                { name: "Нефть", price: 100, quantity: 0, icon: "🛢️" },
+                { name: "Золото", price: 2000, quantity: 0, icon: "🥇" },
+                { name: "Доллар", price: 75, quantity: 0, icon: "💵" },
+                { name: "Евро", price: 85, quantity: 0, icon: "💶" }
+            ],
+            news: [
+                { text: "⚔️ Война на Ближнем Востоке", effect: { "Нефть": 20, "Золото": 50, "Доллар": -5, "Евро": -3 } },
+                { text: "🏦 Центробанк повысил ключевую ставку", effect: { "Нефть": -10, "Золото": -20, "Доллар": 8, "Евро": 4 } },
+                { text: "🇪🇺 Кризис в Европейском союзе", effect: { "Нефть": -5, "Золото": 30, "Доллар": -2, "Евро": -15 } },
+                { text: "🛢️ Найдено новое месторождение нефти", effect: { "Нефть": -15, "Золото": -10, "Доллар": 3, "Евро": 2 } },
+                { text: "🇨🇳 Китай скупает золото", effect: { "Нефть": 5, "Золото": 40, "Доллар": -1, "Евро": -1 } }
+            ],
+            currentNews: null, history: [], oldPrices: {}, round: 0, maxRounds: 10, gameFinished: false
+        };
+
+        function initGame() {
+            gameData = JSON.parse(JSON.stringify(initialGameData));
+            const gameContainer = document.getElementById('game-container');
+            gameContainer.innerHTML = `
+                <div class="budget" id="budget">💰 Бюджет: 1000 ₽</div>
+                <div class="news-card" id="news">📢 Ждём новость... Нажмите "Следующий раунд"!</div>
+                <div class="assets-grid" id="assets"></div>
+                <button class="next" onclick="nextRound()">Следующий раунд</button>
+                <button class="history-btn" onclick="showHistory()">Показать историю</button>
+                <div class="nav-buttons" style="margin-top: 15px;"><a href="index.html">Главное меню</a></div>
+            `;
+            render();
+        }
+
+        function saveOldPrices() {
+            gameData.oldPrices = {};
+            gameData.assets.forEach(asset => { gameData.oldPrices[asset.name] = asset.price; });
+        }
+
+        function applyNewsEffect(news) {
+            if (!news) return;
+            gameData.assets.forEach(asset => {
+                if (news.effect[asset.name]) {
+                    asset.price += news.effect[asset.name];
+                    if (asset.price < 1) asset.price = 1;
+                }
+            });
+        }
+
+        function render() {
+            if (gameData.gameFinished) {
+                const gameContainer = document.getElementById('game-container');
+                let totalAssetsValue = gameData.assets.reduce((sum, asset) => sum + asset.price * asset.quantity, 0);
+                const finalScore = gameData.budget + totalAssetsValue;
+                const profitEarned = finalScore - 1000;
+                let scoreMessage = "Нужно больше тренировки. В следующий раз получится лучше!";
+                let scoreClass = 'score-poor';
+                if (finalScore >= 1750) { scoreMessage = "Ты красавчик! Отличный результат!"; scoreClass = 'score-excellent'; } 
+                else if (finalScore >= 1500) { scoreMessage = "Неплохо, ты среднячок. Продолжай в том же духе!"; scoreClass = 'score-average'; }
+                
+                gameContainer.innerHTML = `
+                    <div class="game-over-message">Игра окончена!</div>
+                    <div class="budget">Ваш финальный бюджет: ${gameData.budget.toFixed(2)} ₽</div>
+                    <div class="news-card">Итоговая стоимость ваших активов: ${totalAssetsValue.toFixed(2)} ₽</div>
+                    <div class="final-score-container ${scoreClass}">
+                        <strong>Ваш итоговый счет: ${finalScore.toFixed(2)} ₽</strong><br>
+                        <strong>Общая прибыль: ${profitEarned.toFixed(2)} ₽</strong><br>
+                        ${scoreMessage}
+                    </div>
+                    <div class="nav-buttons">
+                        <button onclick="initGame()">Играть заново</button>
+                        <a href="index.html">Главное меню</a>
+                    </div>`;
+                return;
+            }
+
+            document.getElementById('budget').innerHTML = `💰 Бюджет: ${gameData.budget.toFixed(2)} ₽`;
+            const newsDiv = document.getElementById('news');
+            newsDiv.innerHTML = gameData.currentNews ? `📢 <strong>Событие (${gameData.round}/${gameData.maxRounds}):</strong> ${gameData.currentNews.text}` : `📢 Ждём новость... Нажмите "Следующий раунд"`;
+            
+            const assetsDiv = document.getElementById('assets');
+            assetsDiv.innerHTML = '';
+            gameData.assets.forEach((asset, index) => {
+                const oldPrice = gameData.oldPrices[asset.name];
+                const priceChange = oldPrice !== undefined ? asset.price - oldPrice : 0;
+                let changeClass = '', changeText = '';
+                if (priceChange > 0) { changeClass = 'price-up'; changeText = `+${priceChange.toFixed(2)}`; } 
+                else if (priceChange < 0) { changeClass = 'price-down'; changeText = `${priceChange.toFixed(2)}`; }
+
+                const card = document.createElement('div');
+                card.className = 'asset-card';
+                card.innerHTML = `
+                    <div class="asset-info">
+                        <div class="asset-name">${asset.icon} ${asset.name} ${changeText ? `<span class="price-change ${changeClass}">${changeText}</span>` : ''}</div>
+                        <div class="asset-price">💰 ${asset.price.toFixed(2)} ₽</div>
+                        <div class="asset-quantity">📦 У вас: ${asset.quantity}</div>
+                    </div>
+                    <div class="asset-controls">
+                        <button onclick="buy(${index})">Купить</button>
+                        <button class="sell" onclick="sell(${index})">Продать</button>
+                    </div>`;
+                assetsDiv.appendChild(card);
+            });
+        }
+
+        window.buy = function(index) {
+            if (gameData.gameFinished) return alert("Игра уже окончена.");
+            const asset = gameData.assets[index];
+            if (gameData.budget >= asset.price && asset.price > 0) {
+                gameData.budget -= asset.price;
+                asset.quantity++;
+                render();
+            } else { alert('❌ Недостаточно средств!'); }
+        };
+
+        window.sell = function(index) {
+            if (gameData.gameFinished) return alert("Игра уже окончена.");
+            const asset = gameData.assets[index];
+            if (asset.quantity > 0) {
+                gameData.budget += asset.price;
+                asset.quantity--;
+                render();
+            } else { alert('❌ У вас нет этого актива!'); }
+        };
+
+        window.nextRound = function() {
+            if (gameData.gameFinished) return alert("Игра уже окончена. Нажмите 'Играть заново'.");
+            saveOldPrices();
+            gameData.round++;
+            if (gameData.round > 1) applyNewsEffect(gameData.currentNews);
+
+            const randomIndex = Math.floor(Math.random() * gameData.news.length);
+            gameData.currentNews = gameData.news[randomIndex];
+            
+            if (gameData.round >= gameData.maxRounds) {
+                applyNewsEffect(gameData.currentNews); // Применяем последнюю новость перед концом
+                gameData.gameFinished = true;
+            }
+            render();
+        };
+
+        window.showHistory = function() { /* ... код истории можно оставить без изменений ... */ };
+
+        initGame();
+    </script>
+</body>
+</html>

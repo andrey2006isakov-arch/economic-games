@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игровой центр</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .main-container { background-color: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 800px; }
+        h1 { color: #333; margin-bottom: 10px; }
+        .subtitle { color: #666; margin-bottom: 40px; }
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; margin-bottom: 40px; }
+        .game-card { background-color: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 10px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.3s ease; }
+        .game-card:hover { transform: translateY(-8px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-color: #007bff; }
+        .game-card .icon { font-size: 48px; margin-bottom: 15px; }
+        .game-card h3 { margin: 0 0 10px 0; color: #007bff; }
+        .game-card p { font-size: 14px; color: #555; line-height: 1.5; }
+        .feedback-section { margin-top: 30px; padding-top: 30px; border-top: 1px solid #eee; }
+        .feedback-section h2 { margin-bottom: 20px; }
+        .feedback-form { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
+        .feedback-form input, .feedback-form textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+        .feedback-form button { background-color: #28a745; color: white; border: none; padding: 15px; border-radius: 6px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; }
+        .feedback-form button:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1>Добро пожаловать в Игровой Центр!</h1>
+        <p class="subtitle">Выберите игру, чтобы начать, или оставьте свой отзыв.</p>
+
+        <div class="games-grid">
+            <a href="game1_quiz.html" class="game-card">
+                <div class="icon">🧠</div>
+                <h3>Экономическая Викторина</h3>
+                <p>Проверь свои знания в области экономики и финансов. Отвечай на вопросы и стань экспертом!</p>
+            </a>
+            <a href="game2_stocks.html" class="game-card">
+                <div class="icon">📈</div>
+                <h3>Симулятор Биржи</h3>
+                <p>Попробуй себя в роли трейдера. Покупай и продавай активы, реагируй на новости и приумножай капитал!</p>
+            </a>
+            <a href="game3_business.html" class="game-card">
+                <div class="icon">🏢</div>
+                <h3>Симулятор Бизнеса</h3>
+                <p>Стань предпринимателем! Покупай готовые бизнесы, получай пассивный доход и построй свою империю.</p>
+            </a>
+        </div>
+
+        <div class="feedback-section">
+            <h2>Оставить отзыв</h2>
+            <!-- ВАЖНО: Атрибут 'action' нужно будет заменить на твой URL из Formspree -->
+            <form id="feedbackForm" action="https://formspree.io/f/YOUR_UNIQUE_ID" method="POST" class="feedback-form">
+                <input type="text" name="name" placeholder="Ваше имя (необязательно)">
+                <input type="email" name="email" placeholder="Ваш Email (необязательно)">
+                <textarea name="message" rows="5" placeholder="Ваш отзыв..." required></textarea>
+                <button type="submit">Отправить</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

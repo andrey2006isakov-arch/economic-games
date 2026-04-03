@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра 1: Экономическая Викторина</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: flex-start; padding-top: 20px; min-height: 100vh; margin: 0; }
+        .game-container { background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 700px; }
+        .question-header { font-size: 20px; color: #555; margin-bottom: 10px; }
+        .question-text { font-size: 24px; font-weight: bold; margin-bottom: 30px; }
+        .answers-grid { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
+        .answer-btn { background-color: #007bff; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 18px; text-align: left; transition: all 0.2s ease; }
+        .answer-btn:hover:not(:disabled) { background-color: #0056b3; transform: scale(1.02); }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.9; }
+        .answer-btn.correct { background-color: #28a745; border: 2px solid #1e7e34; }
+        .answer-btn.incorrect { background-color: #dc3545; border: 2px solid #b21f2d; }
+        .explanation-box { background-color: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; margin-top: 20px; border-radius: 8px; text-align: left; font-size: 16px; line-height: 1.6; display: none; }
+        .explanation-box strong { color: #333; }
+        #next-question-btn { background-color: #ffc107; color: #212529; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 20px; display: none; }
+        .results-container { text-align: center; }
+        .results-container h2 { font-size: 32px; color: #28a745; }
+        .results-container p { font-size: 20px; }
+        .nav-buttons { margin-top: 30px; display: flex; justify-content: center; gap: 15px; }
+        .nav-buttons a, .nav-buttons button { text-decoration: none; background-color: #17a2b8; color: white; padding: 12px 25px; border-radius: 5px; border: none; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="game-container" id="game-container">
+        <!-- Сюда будет рендериться игра -->
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Импорт — это ввоз товара в страну из-за границы.",
+                answers: [
+                    { text: "верно", correct: true },
+                    { text: "неверно", correct: false }
+                ],
+                explanation: "<strong>Правильно!</strong> Импорт (от лат. importo — ввозить) — это действительно ввоз товаров, услуг или капитала в страну из других стран. Противоположное понятие — экспорт, то есть вывоз товаров."
+            },
+            {
+                question: "Национализация — это переход частной собственности в распоряжение государства.",
+                answers: [
+                    { text: "верно", correct: true },
+                    { text: "неверно", correct: false }
+                ],
+                explanation: "<strong>Совершенно верно!</strong> Национализация — это процесс передачи частной собственности (например, заводов, банков) в собственность государства. Обратный процесс называется приватизацией."
+            },
+            {
+                question: "Процент — это доход, получаемый от использования ресурса труд.",
+                answers: [
+                    { text: "верно", correct: false },
+                    { text: "неверно", correct: true }
+                ],
+                explanation: "<strong>Правильный ответ — неверно.</strong> Доход от использования труда называется заработной платой. Процент — это доход от предоставления в долг капитала (например, проценты по вкладу в банке)."
+            },
+            {
+                question: "Кредитор — физическое или юридическое лицо, одалживающее деньги под процент.",
+                answers: [
+                    { text: "верно", correct: true },
+                    { text: "неверно", correct: false }
+                ],
+                explanation: "<strong>Верно!</strong> Кредитор — это сторона, которая предоставляет кредит (деньги, товары) и имеет право требовать его возврата. Тот, кто берет в долг, называется заемщиком."
+            },
+            {
+                question: "Металлические деньги называются:",
+                answers: [
+                    { text: "ассигнации", correct: false },
+                    { text: "банкноты", correct: false },
+                    { text: "монеты", correct: true },
+                    { text: "векселя", correct: false },
+                    { text: "облигации", correct: false }
+                ],
+                explanation: "<strong>Правильно, это монеты.</strong> Монеты — это денежные знаки, изготовленные из металла. Ассигнации и банкноты — это бумажные деньги, а векселя и облигации — это ценные бумаги."
+            },
+            {
+                question: "Способ организации жизни людей, при котором отдельная семья или племя добывает или производит все, что им необходимо:",
+                answers: [
+                    { text: "рыночная экономика", correct: false },
+                    { text: "постиндустриальная экономика", correct: false },
+                    { text: "натуральное хозяйство", correct: true },
+                    { text: "командная экономика", correct: false },
+                    { text: "приусадебное хозяйство", correct: false }
+                ],
+                explanation: "<strong>Правильный ответ — натуральное хозяйство.</strong> Это тип хозяйства, в котором продукты производятся для собственного потребления, а не для продажи. Все необходимое создается внутри общины."
+            },
+            {
+                question: "Мороженное, купленное Вами в магазине, для Вас является:",
+                answers: [
+                    { text: "рентой", correct: false },
+                    { text: "кредитом", correct: false },
+                    { text: "товаром", correct: true },
+                    { text: "доходом", correct: false },
+                    { text: "прибылью", correct: false }
+                ],
+                explanation: "<strong>Верно, это товар.</strong> Товар — это продукт труда, предназначенный для обмена (продажи). Для вас, как для потребителя, мороженое — это товар, который вы приобрели для личного пользования."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        const gameContainer = document.getElementById('game-container');
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const currentQuestion = quizData[currentQuestionIndex];
+            gameContainer.innerHTML = `
+                <div class="question-header">Вопрос ${currentQuestionIndex + 1} из ${quizData.length}</div>
+                <div class="question-text">${currentQuestion.question}</div>
+                <div class="answers-grid" id="answers-grid">
+                    ${currentQuestion.answers.map((answer, index) => `
+                        <button class="answer-btn" onclick="selectAnswer(${index}, ${answer.correct})">${answer.text}</button>
+                    `).join('')}
+                </div>
+                <div class="explanation-box" id="explanation-box"></div>
+                <button id="next-question-btn" onclick="nextQuestion()">Следующий вопрос</button>
+            `;
+        }
+        
+        window.selectAnswer = function(selectedIndex, isCorrect) {
+            const currentQuestion = quizData[currentQuestionIndex];
+            const answerButtons = document.querySelectorAll('.answer-btn');
+            const explanationBox = document.getElementById('explanation-box');
+            const nextButton = document.getElementById('next-question-btn');
+            
+            answerButtons.forEach((button, index) => {
+                button.disabled = true;
+                if (currentQuestion.answers[index].correct) {
+                    button.classList.add('correct');
+                } else if (index === selectedIndex) {
+                    button.classList.add('incorrect');
+                }
+            });
+
+            if (isCorrect) {
+                score++;
+            }
+
+            explanationBox.innerHTML = currentQuestion.explanation;
+            explanationBox.style.display = 'block';
+            
+            nextButton.style.display = 'inline-block';
+            if (currentQuestionIndex === quizData.length - 1) {
+                nextButton.innerText = 'Показать результаты';
+            }
+        }
+
+        window.nextQuestion = function() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            let resultMessage = '';
+            if (score === quizData.length) {
+                resultMessage = 'Великолепно! Ты настоящий знаток экономики! 🏆';
+            } else if (score >= quizData.length / 2) {
+                resultMessage = 'Хороший результат! Ты отлично разбираешься в теме. 👍';
+            } else {
+                resultMessage = 'Неплохое начало! Попробуй еще раз, чтобы закрепить знания. 😊';
+            }
+
+            gameContainer.innerHTML = `
+                <div class="results-container">
+                    <h2>Викторина завершена!</h2>
+                    <p>Ваш результат: ${score} из ${quizData.length} правильных ответов.</p>
+                    <p><strong>${resultMessage}</strong></p>
+                    <div class="nav-buttons">
+                        <button onclick="startQuiz()">Играть заново</button>
+                        <a href="index.html">Главное меню</a>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Запускаем викторину при загрузке страницы
+        startQuiz();
+    </script>
+</body>
+</html>

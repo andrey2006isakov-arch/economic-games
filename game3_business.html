@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра 3: Симулятор Бизнеса</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: flex-start; padding: 20px; min-height: 100vh; margin: 0; box-sizing: border-box; }
+        .game-container { background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 90%; max-width: 800px; }
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h1 { margin: 0; }
+        .header p { color: #666; }
+        .stats { display: flex; justify-content: space-around; background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 25px; }
+        .budget, .profit { font-size: 18px; font-weight: bold; }
+        .businesses { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+        .business-card { border: 2px solid #ddd; border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; transition: all 0.2s ease; }
+        .business-card:hover { transform: translateY(-5px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+        .business-card.selected { border-color: #007bff; background-color: #e7f3ff; }
+        .business-icon { font-size: 40px; margin-bottom: 10px; }
+        .business-name { font-weight: bold; font-size: 18px; }
+        .business-details { margin: 10px 0; font-size: 16px; }
+        .payback { font-size: 13px; color: #6c757d; }
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .buy-btn, .skip-btn, .restart-btn, .nav-btn { border: none; padding: 15px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: background-color 0.3s; }
+        .buy-btn { background-color: #28a745; color: white; }
+        .skip-btn { background-color: #ffc107; color: #212529; }
+        .portfolio { margin-top: 20px; }
+        .portfolio h3 { text-align: center; }
+        .portfolio-items { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .portfolio-item { background-color: #e9ecef; padding: 8px 12px; border-radius: 15px; font-size: 14px; }
+        .result-screen h2 { text-align: center; font-size: 28px; }
+        .result-stats p { font-size: 18px; line-height: 1.6; }
+        .result-green { color: #28a745; }
+        .result-yellow { color: #ffc107; }
+        .result-red { color: #dc3545; }
+        .nav-btn { background-color: #17a2b8; color: white; text-decoration: none; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="game-container" id="gameContainer">
+        <!-- Контент будет вставляться через JavaScript -->
+    </div>
+
+    <script>
+        const businessTemplates = [
+            { name: "Булочная", icon: "🥐" }, { name: "Кофейня", icon: "☕" }, { name: "Книгарня", icon: "📚" },
+            { name: "Цветочный", icon: "🌸" }, { name: "Магазин одежды", icon: "👕" }, { name: "Интернет-магазин", icon: "💻" },
+            { name: "Аптека", icon: "💊" }, { name: "Салон красоты", icon: "💇" }, { name: "Фотостудия", icon: "📸" }
+        ];
+
+        let gameData, selectedIndex = 0;
+
+        function generateBusinesses() {
+            const shuffled = [...businessTemplates].sort(() => 0.5 - Math.random());
+            const templates = shuffled.slice(0, 2);
+            return templates.map((template, index) => {
+                const price = index === 0 ? Math.floor(Math.random() * 201) + 200 : Math.floor(Math.random() * 301) + 500;
+                const profit = index === 0 ? Math.floor(Math.random() * 41) + 40 : Math.floor(Math.random() * 51) + 70;
+                return { ...template, price, profit, paybackRounds: (price / profit).toFixed(1) };
+            });
+        }
+
+        function renderRules() {
+            document.getElementById('gameContainer').innerHTML = `
+                <div class="header"><h1>🏢 Бизнес-игра: Домики</h1><p>Инвестируй в бизнес и заработай максимум!</p></div>
+                <div style="text-align: left; margin: 20px 0; padding:15px; background: #f8f9fa; border-radius:8px;">
+                    <h2>📋 Правила игры</h2>
+                    <ul>
+                        <li><strong>Старт:</strong> у вас есть 1000 рублей.</li>
+                        <li><strong>Цель:</strong> максимизировать капитал за 10 раундов.</li>
+                        <li><strong>Ход:</strong> каждый раунд вам предлагается два бизнеса. Вы можете купить один из них или пропустить ход, чтобы накопить деньги.</li>
+                        <li><strong>Доход:</strong> купленные бизнесы приносят прибыль в начале каждого следующего раунда.</li>
+                    </ul>
+                </div>
+                <button class="buy-btn" style="width:100%;" onclick="startGame()">🚀 Начать игру</button>`;
+        }
+
+        function renderGame() {
+            const container = document.getElementById('gameContainer');
+            const totalProfit = gameData.portfolio.reduce((sum, biz) => sum + biz.profit, 0);
+
+            let portfolioHtml = '';
+            if (gameData.portfolio.length > 0) {
+                portfolioHtml = `<div class="portfolio"><h3>📊 Ваш портфель:</h3><div class="portfolio-items">
+                ${gameData.portfolio.map(biz => `<div class="portfolio-item">${biz.icon} ${biz.name} (+${biz.profit})</div>`).join('')}
+                </div></div>`;
+            }
+
+            container.innerHTML = `
+                <div class="header"><h1>Раунд ${gameData.round}/${gameData.maxRounds}</h1></div>
+                <div class="stats">
+                    <span class="budget">💰 Бюджет: ${gameData.budget} руб.</span>
+                    <span class="profit">📈 Доход за раунд: +${totalProfit} руб.</span>
+                </div>
+                <div class="businesses">
+                    ${gameData.currentBusinesses.map((b, i) => `
+                        <div class="business-card" onclick="selectBusiness(${i})" id="business-${i}">
+                            <div class="business-icon">${b.icon}</div><div class="business-name">${b.name}</div>
+                            <div class="business-details"><span class="price">💰 ${b.price}</span> / <span class="profit">📈 +${b.profit}</span></div>
+                            <div class="payback">⏱️ Окупаемость: ~${b.paybackRounds} раундов</div>
+                        </div>`).join('')}
+                </div>
+                <div class="controls">
+                    <button class="buy-btn" onclick="buySelected()">✅ Купить выбранный</button>
+                    <button class="skip-btn" onclick="skipRound()">⏭️ Пропустить раунд</button>
+                </div>
+                ${portfolioHtml}`;
+            selectBusiness(selectedIndex);
+        }
+
+        window.selectBusiness = function(index) {
+            selectedIndex = index;
+            document.querySelectorAll('.business-card').forEach(card => card.classList.remove('selected'));
+            document.getElementById(`business-${index}`).classList.add('selected');
+        }
+
+        window.buySelected = function() {
+            if (gameData.gameFinished) return;
+            const business = gameData.currentBusinesses[selectedIndex];
+            if (gameData.budget < business.price) return alert('❌ Недостаточно средств!');
+            gameData.budget -= business.price;
+            gameData.portfolio.push(business);
+            nextRound();
+        }
+
+        window.skipRound = function() { if (!gameData.gameFinished) nextRound(); }
+
+        function nextRound() {
+            gameData.budget += gameData.portfolio.reduce((sum, biz) => sum + biz.profit, 0);
+            gameData.round++;
+            if (gameData.round > gameData.maxRounds) return finishGame();
+            gameData.currentBusinesses = generateBusinesses();
+            selectedIndex = 0;
+            renderGame();
+        }
+
+        function finishGame() {
+            gameData.gameFinished = true;
+            const portfolioValue = gameData.portfolio.reduce((sum, biz) => sum + biz.price, 0);
+            const totalResult = gameData.budget + portfolioValue;
+            let resultClass = 'result-red', resultText = 'Бизнес — дело рискованное. Попробуй снова! 💪';
+            if (totalResult >= 3500) { resultClass = 'result-green'; resultText = 'Отличный результат! Ты настоящий бизнесмен! 🌟'; } 
+            else if (totalResult >= 2500) { resultClass = 'result-yellow'; resultText = 'Хороший результат, но есть куда расти 📈'; }
+
+            document.getElementById('gameContainer').innerHTML = `
+                <div class="header"><h1>🏁 Игра завершена!</h1></div>
+                <div class="result-screen">
+                    <div class="result-stats">
+                        <h2>Итоговый капитал: <span class="${resultClass}">${totalResult} руб.</span></h2>
+                        <p>Прибыль: ${totalResult >= 1000 ? '+' : ''}${totalResult - 1000} руб.</p>
+                        <p>${resultText}</p>
+                    </div>
+                    <div class="controls">
+                        <button class="restart-btn" onclick="startGame()">🔄 Играть заново</button>
+                        <a href="index.html" class="nav-btn">🌍 Главное меню</a>
+                    </div>
+                </div>`;
+        }
+
+        window.startGame = function() {
+            selectedIndex = 0;
+            gameData = {
+                budget: 1000, round: 1, maxRounds: 10, gameFinished: false,
+                currentBusinesses: generateBusinesses(), portfolio: []
+            };
+            renderGame();
+        };
+
+        renderRules();
+    </script>
+</body>
+</html>
