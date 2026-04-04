@@ -24,10 +24,8 @@
         .asset-controls button:hover { background-color: #1976D2; }
         .asset-controls .sell { background-color: #f44336; }
         .asset-controls .sell:hover { background-color: #d32f2f; }
-        .next, .history-btn { background-color: #4CAF50; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px; transition: background-color 0.3s ease; }
-        .next:hover, .history-btn:hover { background-color: #45a049; }
-        .history-btn { background-color: #FFC107; margin-left: 10px; }
-        .history-btn:hover { background-color: #e0a800; }
+        .next { background-color: #4CAF50; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px; transition: background-color 0.3s ease; }
+        .next:hover { background-color: #45a049; }
         .game-over-message { font-size: 30px; font-weight: bold; color: #d32f2f; margin-bottom: 20px; }
         .final-score-container { margin-top: 25px; padding: 15px; border-radius: 8px; font-size: 18px; line-height: 1.7; }
         .score-excellent { background-color: #e8f5e9; border: 1px solid #7cb342; color: #33691e; }
@@ -40,12 +38,7 @@
 </head>
 <body>
     <div class="game-container" id="game-container">
-        <div class="budget" id="budget">💰 Бюджет: 1000 ₽</div>
-        <div class="news-card" id="news">📢 Ждём новость... Нажмите "Следующий раунд"!</div>
-        <div class="assets-grid" id="assets"></div>
-        <button class="next" onclick="nextRound()">Следующий раунд</button>
-        <button class="history-btn" onclick="showHistory()">Показать историю</button>
-        <div class="nav-buttons" style="margin-top: 15px;"><a href="index.html">Главное меню</a></div>
+        <!-- Контент будет генерироваться здесь -->
     </div>
 
     <script>
@@ -65,7 +58,7 @@
                 { text: "🛢️ Найдено новое месторождение нефти", effect: { "Нефть": -15, "Золото": -10, "Доллар": 3, "Евро": 2 } },
                 { text: "🇨🇳 Китай скупает золото", effect: { "Нефть": 5, "Золото": 40, "Доллар": -1, "Евро": -1 } }
             ],
-            currentNews: null, history: [], oldPrices: {}, round: 0, maxRounds: 10, gameFinished: false
+            currentNews: null, oldPrices: {}, round: 0, maxRounds: 10, gameFinished: false
         };
 
         function initGame() {
@@ -76,7 +69,6 @@
                 <div class="news-card" id="news">📢 Ждём новость... Нажмите "Следующий раунд"!</div>
                 <div class="assets-grid" id="assets"></div>
                 <button class="next" onclick="nextRound()">Следующий раунд</button>
-                <button class="history-btn" onclick="showHistory()">Показать историю</button>
                 <div class="nav-buttons" style="margin-top: 15px;"><a href="index.html">Главное меню</a></div>
             `;
             render();
@@ -157,9 +149,7 @@
             if (gameData.gameFinished) return alert("Игра уже окончена.");
             const asset = gameData.assets[index];
             if (gameData.budget >= asset.price && asset.price > 0) {
-                gameData.budget -= asset.price;
-                asset.quantity++;
-                render();
+                gameData.budget -= asset.price; asset.quantity++; render();
             } else { alert('❌ Недостаточно средств!'); }
         };
 
@@ -167,9 +157,7 @@
             if (gameData.gameFinished) return alert("Игра уже окончена.");
             const asset = gameData.assets[index];
             if (asset.quantity > 0) {
-                gameData.budget += asset.price;
-                asset.quantity--;
-                render();
+                gameData.budget += asset.price; asset.quantity--; render();
             } else { alert('❌ У вас нет этого актива!'); }
         };
 
@@ -178,18 +166,14 @@
             saveOldPrices();
             gameData.round++;
             if (gameData.round > 1) applyNewsEffect(gameData.currentNews);
-
             const randomIndex = Math.floor(Math.random() * gameData.news.length);
             gameData.currentNews = gameData.news[randomIndex];
-            
             if (gameData.round >= gameData.maxRounds) {
-                applyNewsEffect(gameData.currentNews); // Применяем последнюю новость перед концом
+                applyNewsEffect(gameData.currentNews);
                 gameData.gameFinished = true;
             }
             render();
         };
-
-        window.showHistory = function() { /* ... код истории можно оставить без изменений ... */ };
 
         initGame();
     </script>
