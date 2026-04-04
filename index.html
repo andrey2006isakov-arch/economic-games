@@ -18,7 +18,7 @@
         .feedback-section { margin-top: 30px; padding-top: 30px; border-top: 1px solid #eee; }
         .feedback-section h2 { margin-bottom: 20px; }
         .feedback-form { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
-        .feedback-form input, .feedback-form textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+        .feedback-form textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
         .feedback-form button { background-color: #28a745; color: white; border: none; padding: 15px; border-radius: 6px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; }
         .feedback-form button:hover { background-color: #218838; }
     </style>
@@ -48,10 +48,8 @@
 
         <div class="feedback-section">
             <h2>Оставить отзыв</h2>
-            <!-- ВАЖНО: Атрибут 'action' нужно будет заменить на твой URL из Formspree -->
-            <form id="feedbackForm" action="https://formspree.io/f/xgopnwlb" method="POST" class="feedback-form">
-                <input type="text" name="name" placeholder="Ваше имя (необязательно)">
-                <input type="email" name="email" placeholder="Ваш Email (необязательно)">
+            <!-- Не забудь вставить сюда свой URL из Formspree -->
+            <form id="feedbackForm" action="https://formspree.io/f/YOUR_UNIQUE_ID" method="POST" class="feedback-form">
                 <textarea name="message" rows="5" placeholder="Ваш отзыв..." required></textarea>
                 <button type="submit">Отправить</button>
             </form>
