@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Игровой центр</title>
     <style>
+        /* ... (все стили остаются прежними) ... */
         body { font-family: 'Arial', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
         .main-container { background-color: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 800px; }
         h1 { color: #333; margin-bottom: 10px; }
@@ -19,6 +20,7 @@
         .feedback-section h2 { margin-bottom: 20px; }
         .feedback-form { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
         .feedback-form textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+        .feedback-form input[type="email"] { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
         .feedback-form button { background-color: #28a745; color: white; border: none; padding: 15px; border-radius: 6px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; }
         .feedback-form button:hover { background-color: #218838; }
     </style>
@@ -48,10 +50,15 @@
 
         <div class="feedback-section">
             <h2>Оставить отзыв</h2>
-            <!-- Форма для Forminit.com с префиксом для сообщения -->
+            <!-- ЗАМЕНИ ВНИЗУ URL НА СВОЙ СОБСТВЕННЫЙ URL ИЗ FORMinit.com -->
             <form action="https://forminit.com/f/xy4xmdtwi9l" method="POST" class="feedback-form">
-                <!-- Используем префикс "fi-text-" для поля сообщения -->
-                <textarea name="fi-text-message" rows="5" placeholder="Ваш отзыв..." required></textarea>
+                <label for="sender-email">Ваш email:</label>
+                <!-- Для Forminit.com лучше использовать fi-sender-email -->
+                <input type="email" id="sender-email" name="fi-sender-email" placeholder="Ваш email" required>
+
+                <label for="message-text">Ваш отзыв:</label>
+                <!-- Для Forminit.com лучше использовать fi-text-message -->
+                <textarea name="fi-text-message" id="message-text" rows="5" placeholder="Ваш отзыв..." required></textarea>
                 <button type="submit">Отправить</button>
             </form>
         </div>
