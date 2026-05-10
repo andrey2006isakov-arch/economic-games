@@ -48,14 +48,12 @@
 
         <div class="feedback-section">
             <h2>Оставить отзыв</h2>
-            <!-- Не забудь вставить сюда свой URL из Formspree -->
-            <form id="feedbackForm" action="https://forminit.com/f/xy4xmdtwi9l" method="POST" class="feedback-form">
-                <textarea name="message" rows="5" placeholder="Ваш отзыв..." required></textarea>
-                <!-- Если ты хочешь добавить поле для email, чтобы Formspree знал, кто написал: -->
-                <!-- <input type="email" name="email" placeholder="Ваш email"> -->
+            <!-- Форма для Forminit.com с префиксом для сообщения -->
+            <form action="https://forminit.com/f/xy4xmdtwi9l" method="POST" class="feedback-form">
+                <!-- Используем префикс "fi-text-" для поля сообщения -->
+                <textarea name="fi-text-message" rows="5" placeholder="Ваш отзыв..." required></textarea>
                 <button type="submit">Отправить</button>
-        </form>
-
+            </form>
         </div>
     </div>
 </body>
