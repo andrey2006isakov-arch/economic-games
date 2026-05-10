@@ -20,7 +20,7 @@
         .feedback-section h2 { margin-bottom: 20px; }
         .feedback-form { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
         .feedback-form textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
-        .feedback-form input[type="email"] { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+        /* Поле email удалено */
         .feedback-form button { background-color: #28a745; color: white; border: none; padding: 15px; border-radius: 6px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; }
         .feedback-form button:hover { background-color: #218838; }
     </style>
@@ -52,9 +52,8 @@
             <h2>Оставить отзыв</h2>
             <!-- !!! ВАЖНО: ЗАМЕНИТЕ https://forminit.com/f/xy4xmdtwi9l НА ВАШ РЕАЛЬНЫЙ URL ИЗ ПАНЕЛИ FORMinit.com !!! -->
             <form action="https://forminit.com/f/xy4xmdtwi9l" method="POST" class="feedback-form">
-            
-
                 <label for="message-text">Ваш отзыв:</label>
+                <!-- Для Forminit.com лучше использовать fi-text-message -->
                 <textarea name="fi-text-message" id="message-text" rows="5" placeholder="Ваш отзыв..." required></textarea>
                 <button type="submit">Отправить</button>
             </form>
