@@ -50,14 +50,12 @@
 
         <div class="feedback-section">
             <h2>Оставить отзыв</h2>
-            <!-- ЗАМЕНИ ВНИЗУ URL НА СВОЙ СОБСТВЕННЫЙ URL ИЗ FORMinit.com -->
+            <!-- !!! ВАЖНО: ЗАМЕНИТЕ https://forminit.com/f/xy4xmdtwi9l НА ВАШ РЕАЛЬНЫЙ URL ИЗ ПАНЕЛИ FORMinit.com !!! -->
             <form action="https://forminit.com/f/xy4xmdtwi9l" method="POST" class="feedback-form">
                 <label for="sender-email">Ваш email:</label>
-                <!-- Для Forminit.com лучше использовать fi-sender-email -->
                 <input type="email" id="sender-email" name="fi-sender-email" placeholder="Ваш email" required>
 
                 <label for="message-text">Ваш отзыв:</label>
-                <!-- Для Forminit.com лучше использовать fi-text-message -->
                 <textarea name="fi-text-message" id="message-text" rows="5" placeholder="Ваш отзыв..." required></textarea>
                 <button type="submit">Отправить</button>
             </form>
